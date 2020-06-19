@@ -1,9 +1,9 @@
 import React from 'react';
 import {Layout, Menu} from 'antd';
-import "./styles/main.css";
-import UserBody from "./components/userBody";
-import CommentsBody from "./components/CommentsBody";
-import PostBody from "./components/PostBody";
+import "../styles/main.css";
+import UserBody from "./user/userBody";
+import PostBody from "./post/PostBody";
+import CommentsBody from "./comments/CommentsBody";
 
 const { Sider } = Layout;
 
@@ -51,14 +51,8 @@ class Main extends React.Component {
 
                 <Layout  >
                     <Sider theme="light"
-                        breakpoint="lg"
-                        collapsedWidth="0"
-                        onBreakpoint={broken => {
-                            console.log(broken);
-                        }}
-                        onCollapse={(collapsed, type) => {
-                            console.log(collapsed, type);
-                        }}
+                           breakpoint="lg"
+                           collapsedWidth="0"
                            className="main-sider"
                     >
                         <div className="sider-header " >

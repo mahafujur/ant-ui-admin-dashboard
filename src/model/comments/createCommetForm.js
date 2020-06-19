@@ -22,34 +22,28 @@ const tailLayout = {
 
 
 const CREATE_POST_API = gql`
-   mutation (  $payload:  post_input_payload!) {
-   createPost(payload: $payload){
+   mutation ( $payload: comment_input_payload!) {
+   createComment(payload: $payload){
       id
         data {
             body
-            title
-            __typename
         }
-        comment {
+        post {
             id
             data {
-                body
-                __typename
+                title
             }
-            __typename
         }
-        __typename
     }
 }
 
 `;
 
 
-function CreatePostForm() {
+function CreateCommentForm() {
     const [loader, setLoader]=useState(false);
-    const [createPost, {data:mutationRespons ,loading: mutationLoading, error: mutationError}]  = useMutation(CREATE_POST_API);
+    const [createComment, {data:mutationRespons ,loading: mutationLoading, error: mutationError}]  = useMutation(CREATE_POST_API);
     const [form] = Form.useForm();
-
 
     const onReset = () => {
         form.resetFields();
@@ -57,11 +51,11 @@ function CreatePostForm() {
 
     const onFinish = values => {
 
-        if(values.name.length>0 && values.address.length>0) {
-            createPost({
+        if(values.body.length>0) {
+            createComment({
                 variables:
                     {
-                        payload: {"title": values.name, "body": values.address}
+                        payload: {"body": values.body}
                     }
             });
             setTimeout(() => {
@@ -74,30 +68,17 @@ function CreatePostForm() {
         <div>
         <Form
             layout="vertical"
-            name="Title"
+            name="Comment"
             onFinish={onFinish}
             form={form}
         >
             <Form.Item
-                label="Username"
-                name="name"
+                label="Body"
+                name="body"
                 rules={[
                     {
                         required: true,
-                        message: 'Please input your post!',
-                    },
-                ]}
-            >
-                <Input />
-            </Form.Item>
-
-            <Form.Item
-                label="Address"
-                name="address"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Please input your  post body!',
+                        message: 'Please input your comment!',
                     },
                 ]}
             >
@@ -114,12 +95,12 @@ function CreatePostForm() {
                 </Button>
             </Form.Item>
         </Form>
-            {mutationRespons && mutationRespons.createPost.data && <SuccessModal
-            data={"Successfully User created"}/>
+            {mutationRespons && mutationRespons.createComment.data && <SuccessModal
+            data={"Successfully Comment added"}/>
             }
         </div>
 
 
     );
 }
-export default CreatePostForm;
+export default CreateCommentForm;

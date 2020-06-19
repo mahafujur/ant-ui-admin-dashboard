@@ -1,8 +1,9 @@
 import React from 'react';
 import {Layout, Menu, Typography} from 'antd';
-import "../styles/containerBody.css";
-import ContainerBody from "./ContainerBody";
-import BlankPage from "../commonComponents/blankPage";
+import "../../styles/containerBody.css";
+import UserContainerBody from "./userContainerBody";
+import BlankPage from "../../commonComponents/blankPage";
+
 const {  Content } = Layout;
 
 class UserBody extends React.Component {
@@ -56,7 +57,7 @@ class UserBody extends React.Component {
                 </Menu>
                 <Content className="site-layout" >
                     <div className="site-layout-background" style={{  minHeight: 380 }}>
-                        {this.state.firstPage===true &&  <ContainerBody/> }
+                        {this.state.firstPage===true &&  <UserContainerBody/> }
                         {this.state.secondPage===true &&  <BlankPage/> }
                     </div>
                 </Content>

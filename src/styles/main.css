@@ -1,0 +1,35 @@
+.main-sider{
+    /*box-shadow: .2px 0px 0px lightslategrey;*/
+    height:100vh;
+    /*border: 1px solid;*/
+    border-right: .1px  lightslategrey;
+}
+
+.sider-header {
+    height: 6.5vh;
+    background: #545cff;
+    color:white;
+    font-weight:600;
+    font-size: 18px;
+    text-align: center;
+
+}
+.sider-title {
+    color:white;
+    text-align: center;
+    padding-top: 16px;
+
+}
+.main-sider-menu{
+    /*box-shadow: .2px 0px 0px lightslategrey;*/
+    /*height:94.5vh;*/
+    /*border: 1px solid;*/
+}
+
+.site-layout-sub-header-background {
+    background: #fff;
+}
+
+.site-layout-background {
+    background: #fff;
+}

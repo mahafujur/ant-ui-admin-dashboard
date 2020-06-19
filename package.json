@@ -1,11 +1,22 @@
 {
-  "name": "antd-demo",
-  "version": "0.1.0",
+  "name": "shikho-admi",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@ant-design/icons": "latest",
+    "@apollo/react-components": "^3.1.5",
+    "@apollo/react-hooks": "^3.1.5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "antd": "^4.3.4",
+    "apollo-boost": "^0.4.9",
+    "apollo-cache-inmemory": "latest",
+    "apollo-client": "latest",
+    "apollo-link-context": "^1.0.20",
+    "apollo-link-http": "latest",
+    "graphql": "^0.13.2",
+    "graphql-tag": "latest",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
@@ -30,5 +41,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {}
 }

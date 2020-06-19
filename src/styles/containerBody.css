@@ -1,0 +1,22 @@
+/*#comments-layout-demo-top-side-2 .logo {*/
+    /*width: 120px;*/
+    /*height: 64px;*/
+    /*background: rgba(255, 255, 255, 0.2);*/
+    /*margin: 16px 28px 16px 0;*/
+    /*float: left;*/
+/*}*/
+
+.container-body-header{
+    height: 6.5vh;
+    text-align: left;
+}
+.container-body-sub-menu{
+    padding-top: 10px;
+    height: 6.5vh;
+    width: 120px;
+    color:white;
+    font-weight:500;
+    font-size: 16px;
+    text-align: center;
+
+}

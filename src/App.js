@@ -1,26 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import ApolloClient from "apollo-boost";
+import {ApolloProvider} from "@apollo/react-hooks";
+import "./styles/App.css";
+import Main from "./model/main";
+
+const client = new ApolloClient({
+    uri: 'http://13.127.101.229:4000/graphql',
+    request: (operation) => {
+
+        operation.setContext({
+            headers: {
+                authorization: process.env.REACT_APP_TOKEN ? `Bearer ${process.env.REACT_APP_TOKEN}` : ''
+            }
+        })
+    }
+})
+
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <ApolloProvider client={client}>
+             <Main/>
+      </ApolloProvider>
   );
 }
 
 export default App;
+

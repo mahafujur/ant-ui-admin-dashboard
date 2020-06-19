@@ -2,35 +2,37 @@ import React, {useEffect, useState} from 'react';
 import {Affix, Col, Layout, Menu, Row} from 'antd';
 import "../../styles/menu.css";
 import {PicRightOutlined} from '@ant-design/icons';
-import UserFormLayout from "./userFormLayout";
 import PopUpButton from "../../commonComponents/popupButton";
 import {useQuery} from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import CommentFormLayout from "./commentFormLayout";
 
 
-const USER_API = gql`
-  query getAllUser {
-    users {
-        id
+const COMMENTS_API = gql`
+  query Comments {
+    comments{
+       id
         data {
-            name
-            address
+            body
+        }
+        post {
+            id
+            data {
+                title
+            }
         }
     }
-}
-
+    }
 `;
-
-
 
 const {Sider} = Layout;
 
 
-function UserContainerBody(){
-    const [users, setUsers] = useState([]);
-    const [user, setUser] = useState();
+function CommentsContainerBody(){
+    const [comments, setComments] = useState([]);
+    const [comment, setComment] = useState();
     const [id,setId]=useState(null);
-    const { loading,error,refetch, data } = useQuery(USER_API,{});
+    const { loading,error,refetch, data } = useQuery(COMMENTS_API,{});
 
     function callbackMethod (value){
         if(value===true) {
@@ -40,15 +42,16 @@ function UserContainerBody(){
 
 
     useEffect(() => {
-    },[user]);
+    },[comment]);
 
-    function menuClick(user){
-        setUser(user)
-        setId(user.id)
+    function menuClick(comment){
+        setComment(comment)
+        setId(comment.id)
     }
 
     if (loading) return <p>Loading ...</p>;
     if(error) return <p>error!</p>;
+
 
     return (
             <Layout>
@@ -60,15 +63,14 @@ function UserContainerBody(){
                                 mode="inline"
                                 style={{height: "90vh"}}
                             >
-                                {data &&  data.users.map(user => {
+                                {data &&  data.comments.map(comment => {
                                     return (
                                         <Menu.Item
-                                            key={user.id}
+                                            key={comment.id}
                                             icon={<PicRightOutlined/>}
-                                            onClick={()=>menuClick(user) }
+                                            onClick={()=>menuClick(comment) }
                                         >
-
-                                            {user.data.name}
+                                            {comment.data.body}
                                         </Menu.Item>
                                     )
                                 })
@@ -79,12 +81,12 @@ function UserContainerBody(){
                     </Col>
 
                     <Col xs={24} sm={0} md={0} lg={19} xl={19} style={{height: "90vh"}}>
-                        {user &&  <UserFormLayout
-                            user={user}
+                        {comment &&  <CommentFormLayout
+                            comment={comment}
                             callbackData ={callbackMethod}
                         /> }
                         <Affix style={{ position: 'absolute', bottom: 10, left: "2%" }}>
-                            <PopUpButton data={"Add User"}/>
+                            <PopUpButton data={"Create Comment"}/>
                         </Affix>
                     </Col>
 
@@ -94,4 +96,4 @@ function UserContainerBody(){
         );
 }
 
-export default UserContainerBody;
+export default CommentsContainerBody;

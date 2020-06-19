@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import {useMutation, useQuery} from '@apollo/react-hooks';
 
 import { Form, Input, Button, Checkbox, Result } from 'antd';
-import SuccessModal from "./successModal";
+import SuccessModal from "../../commonComponents/successModal";
 
 const layout = {
     labelCol: {

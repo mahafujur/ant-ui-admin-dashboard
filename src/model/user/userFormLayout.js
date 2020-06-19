@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Card, Input, Typography} from 'antd';
 import {BlockOutlined} from '@ant-design/icons';
-import "../styles/form.css";
-import {useMutation} from "@apollo/react-hooks";
+import "../../styles/form.css";
+import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import SuccessModal from "./successModal";
+import SuccessModal from "../../commonComponents/successModal";
 
 const EDIT_USER_API = gql`
    mutation ($_id: String!, $payload:user_input_payload!,) {
@@ -19,19 +19,55 @@ const EDIT_USER_API = gql`
 
 `;
 
+const POSTS_API = gql`
+  query Posts {
+    posts{
+        id
+        data {
+            body
+            title
+       
+        }
+        comment {
+            id
+            data {
+                body
+                
+            }
+          
+        }
+        
+    }
+    }
+
+`;
 export default  function  UserFormLayout(props) {
-    console.log(props);
-    const userInfo= props.data;
-    const userName= props.data.data.name;
-    const userAddress= props.data.data.address;
-    const userId= props.data.id;
+    const [profileState, setProfileState] = useState(props);
+    const [state,setState]=useState(false);
+    const {  data:post } = useQuery(POSTS_API,{});
+
+
+
+    useEffect(() => {
+        setProfileState(props)
+        setName(props.user.data.name)
+        setAddress(props.user.data.address)
+        setId(props.user.id)
+
+    },[props]);
+
+
+    const userInfo= profileState.user;
+    const userName= profileState.user.data.name;
+    const userAddress= profileState.user.data.address;
+    const userId= profileState.user.id;
 
     const [name,setName]=useState(userName);
     const [address,setAddress]=useState(userAddress);
     const [idIs,setId]=useState(userId);
-    const [userEditedDataSubmit,setUserEditedDataSubmit]=useState(false);
 
     const [updateUser, {data: mutationResult, loading: mutationLoading, error: mutationError}]  = useMutation(EDIT_USER_API);
+
 
     function handleNameChange(e) {
 
@@ -40,18 +76,9 @@ export default  function  UserFormLayout(props) {
     function handleAddressChange(e) {
         setAddress(e.target.value);
     }
-    const handleInputValueChanges = event => {
-        console.log(event);
-        const { name, value } = event.target;
-        setName({
-            ...name,
-            [name]: value,
-        });
-    };
-
 
     if(mutationResult && mutationResult.updateUser){
-        props.callbackData (true)
+          props.callbackData (true);
     }
 
 
@@ -76,6 +103,7 @@ export default  function  UserFormLayout(props) {
                     extra={ <Button  shape="round" icon={<BlockOutlined />} size={"large"}
                                      onClick={e => {
                                          e.preventDefault();
+                                         setState(true)
                                          updateUser({ variables:
                                                  {
                                                      _id: idIs,
@@ -110,7 +138,7 @@ export default  function  UserFormLayout(props) {
                     <Typography className="form-filed-subtitle">Search posts and tags </Typography>
                 <Input placeholder="Your posts here"
                        value=""
-                       // onChange={(event)=>this.handleInputValueChanges('', event.target.value)}
+
                 />
                     <br/>
                 </Card>
