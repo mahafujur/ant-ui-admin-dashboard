@@ -37,6 +37,7 @@ const {Sider} = Layout;
 function PostContainerBody(){
     const [posts, setPosts] = useState([]);
     const [post, setPost] = useState();
+    const [commentsOfPosts, setCommentsOfPosts]= useState([]);
     const [id,setId]=useState(null);
     const { loading,error,refetch, data } = useQuery(POSTS_API,{});
 
@@ -51,7 +52,16 @@ function PostContainerBody(){
     },[post]);
 
     function menuClick(post){
+
         setPost(post)
+        let old=[];
+        if(post.comment !==null) {
+            old.push(post.comment);
+            setCommentsOfPosts(old)
+        }
+        else {
+            setCommentsOfPosts(old)
+        }
         setId(post.id)
     }
 
@@ -90,6 +100,7 @@ function PostContainerBody(){
                     <Col xs={24} sm={0} md={0} lg={19} xl={19} style={{height: "90vh"}}>
                         {post &&  <PostFormLayout
                             post={post}
+                            comment={commentsOfPosts}
                             callbackData ={callbackMethod}
                         /> }
                         <Affix style={{ position: 'absolute', bottom: 10, left: "2%" }}>

@@ -1,14 +1,57 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Input ,Typography} from 'antd';
+import {Button, Card, Input, Tag, Typography} from 'antd';
 import {BlockOutlined} from '@ant-design/icons';
 import "../../styles/form.css";
-import {useMutation} from "@apollo/react-hooks";
+import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import SuccessModal from "../../commonComponents/successModal";
+import AutoCompleteComponent from "../../commonComponents/autocompleteForPost";
 
 const { TextArea } = Input;
 
+const COMMENTS_API = gql`
+  query Comments {
+    comments{
+       id
+        data {
+            body
+        }
+        post {
+            id
+            data {
+                title
+                body
+            }
+        }
+    }
+    }
+`;
+
+
 const EDIT_POST_API = gql`
+  mutation ($_id: String!, $payload: post_input_payload!, $connect: post_input_connection_payload!) {
+    updatePost(_id: $_id, payload: $payload, connect: $connect) {
+        id
+        data {
+            body
+            title
+            __typename
+        }
+        comment {
+            id
+            data {
+                body
+                __typename
+            }
+            __typename
+        }
+        __typename
+    }
+}
+`;
+
+
+const EDIT_NEW_POST_API = gql`
   mutation ($_id: String!, $payload: post_input_payload!, $connect: post_input_connection_payload!, $disconnect: post_input_disconnection_payload!) {
     updatePost(_id: $_id, payload: $payload,
         connect: $connect, disconnect: $disconnect) {
@@ -29,19 +72,22 @@ const EDIT_POST_API = gql`
         __typename
     }
 }
-
 `;
 
 export default  function  PostFormLayout(props) {
+    const {  data:comments} = useQuery(COMMENTS_API,{});
     const [profileState, setProfileState] = useState(props);
+    const [updateTagPosts, setUpdateTagPosts]= useState(props.comment[0]);
+
     const [state,setState]=useState(false);
+    const [sabdhanModal, setSabdhanModal]= useState(false);
 
     useEffect(() => {
         setProfileState(props)
         setTitle(props.post.data.title)
         setBody(props.post.data.body)
         setPostId(props.post.id)
-
+        setUpdateTagPosts(props.comment[0]);
     },[props]);
 
     const postInfo= profileState.post;
@@ -53,8 +99,8 @@ export default  function  PostFormLayout(props) {
     const [body,setBody]=useState(postBody);
     const [postId,setPostId]=useState(postIdIs);
 
-    const [updatePost, {data: mutationResult, loading: mutationLoading, error: mutationError}]  = useMutation(EDIT_POST_API);
-    console.log(">>>",setProfileState);
+    const [updatePost, {data: mutationResult, loading: mutationLoading, error: mutationError}]  = useMutation(props.comment.length>0 ? EDIT_NEW_POST_API : EDIT_POST_API);
+
 
     function handleNameChange(e) {
 
@@ -64,8 +110,72 @@ export default  function  PostFormLayout(props) {
         setBody(e.target.value);
     }
 
+    function removeDuplicateDataFromArray(data) {
+
+        return data.filter((v,i,a)=>a.findIndex(t=>(t.id === v.id))===i);
+    }
+
+    function handleSearchInput(comment) {
+        let oldComment= [];
+        oldComment=updateTagPosts;
+        oldComment.push(comment);
+        let newArray= removeDuplicateDataFromArray(oldComment);
+        setUpdateTagPosts(newArray);
+    }
+
+    function onClose(post){
+        let old=[];
+        old= updateTagPosts;
+        let filtered = old.filter(value=> value.id != post.id);
+        setUpdateTagPosts(filtered);
+    }
+    function  updatePostApi() {
+        if(props.comment && props.comment[0].length>0) {
+
+            if(updateTagPosts.length>0){
+
+                updatePost({ variables:
+                        {
+                            _id: postIdIs,
+                            payload:{"title": title,"body": body },
+                            connect:{"comment_ids":  [updateTagPosts[0].id ]},
+                            disconnect:{"comment_ids":[props.comment[0][0].id]},
+                        }
+                });
+            }
+            else
+            {
+                setSabdhanModal(true)
+                setTimeout(() => {
+                    setSabdhanModal(false)
+                }, 2000);
+            }
+        }
+        else {
+
+            updatePost({
+
+
+                variables:
+                    {
+                        _id: postIdIs,
+                        payload:{"title": title,"body": body },
+                        connect:{"comment_ids": [updateTagPosts[0].id ]}
+                        // disconnect:{"comment_ids": "disConnectedCommentId" },
+                    }
+            });
+        }
+    }
+
+    if(mutationError){
+        alert(console.log(mutationError));
+    }
     if(mutationResult && mutationResult.updatePost){
-          props.callbackData (true);
+        props.callbackData (true);
+    }
+
+    if(sabdhanModal===true){
+        alert("You have to put at least one comment");
     }
 
 
@@ -88,20 +198,7 @@ export default  function  PostFormLayout(props) {
                     bordered="false"
                     headStyle={{fontSize:24, color:"#686f74"}}
                     extra={ <Button  shape="round" icon={<BlockOutlined />} size={"large"}
-                                     onClick={e => {
-                                         e.preventDefault();
-                                         setState(true)
-                                         updatePost({ variables:
-                                                 {
-                                                     _id: postIdIs,
-                                                     payload:{"title": title,"body": body },
-                                                     connect:{"comment_ids": "connectedCommentId" },
-                                                     disconnect:{"comment_ids": "disConnectedCommentId" },
-
-                                                 }
-
-                                         });
-                                     } }
+                                     onClick={updatePostApi}
                     >
                         Update</Button>}
                 >
@@ -128,10 +225,22 @@ export default  function  PostFormLayout(props) {
 
                 <Typography className="form-filed-title"> Comments </Typography>
                     <Typography className="form-filed-subtitle">Search comments  and assign it to the post </Typography>
-                <Input placeholder="Your posts here"
-                       value=""
 
-                />
+                    {comments && comments.comments && < AutoCompleteComponent
+                        data={comments.comments}
+                        selectFromSearch={handleSearchInput}
+                    />}
+
+
+                    {updateTagPosts && updateTagPosts.length > 0 && updateTagPosts !==undefined && updateTagPosts.map(post => {
+                        return (
+
+                            <Tag closable onClose={() => onClose(post)} key={post.id} style={{fontWeight:700, color:"black"}} >
+                                {post.data.body}
+                            </Tag>
+
+                        )
+                    })}
                     <br/>
                 </Card>
 

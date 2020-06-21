@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Input, Typography} from 'antd';
+import {Button, Card, Input, Tag, Typography} from 'antd';
 import {BlockOutlined} from '@ant-design/icons';
 import "../../styles/form.css";
 import {useMutation, useQuery} from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import SuccessModal from "../../commonComponents/successModal";
+import AutoCompleteComponent from "../../commonComponents/autocomplete";
+import {Menu} from "antd/lib/menu";
 
 const EDIT_USER_API = gql`
-   mutation ($_id: String!, $payload:user_input_payload!,) {
+   mutation ($_id: String!, $payload:user_input_payload!) {
    updateUser(_id: $_id, payload: $payload){
         id
         data {
@@ -41,11 +43,14 @@ const POSTS_API = gql`
     }
 
 `;
+
+
 export default  function  UserFormLayout(props) {
     const [profileState, setProfileState] = useState(props);
     const [state,setState]=useState(false);
-    const {  data:post } = useQuery(POSTS_API,{});
+    const [updateTagPosts, setUpdateTagPosts]= useState([]);
 
+    const {  data:post } = useQuery(POSTS_API,{});
 
 
     useEffect(() => {
@@ -53,6 +58,7 @@ export default  function  UserFormLayout(props) {
         setName(props.user.data.name)
         setAddress(props.user.data.address)
         setId(props.user.id)
+        setUpdateTagPosts([]);
 
     },[props]);
 
@@ -77,9 +83,31 @@ export default  function  UserFormLayout(props) {
         setAddress(e.target.value);
     }
 
+    function removeDuplicateDataFromArray(data) {
+        return [... new Set(data)];
+    }
+    function handleSearchInput(post) {
+        let oldPosts= [];
+        oldPosts=updateTagPosts;
+        oldPosts.push(post);
+        let newArray= removeDuplicateDataFromArray(oldPosts);
+        setUpdateTagPosts(newArray);
+        // console.log(newArray);
+    }
+
+    function onClose(post){
+        let old=[];
+        old= updateTagPosts;
+         let filtered = old.filter( value=> value.id != post.id);
+        setUpdateTagPosts(filtered);
+    }
+
+
+
     if(mutationResult && mutationResult.updateUser){
           props.callbackData (true);
     }
+
 
 
     if(userInfo===undefined) {
@@ -136,11 +164,21 @@ export default  function  UserFormLayout(props) {
 
                 <Typography className="form-filed-title"> Posts </Typography>
                     <Typography className="form-filed-subtitle">Search posts and tags </Typography>
-                <Input placeholder="Your posts here"
-                       value=""
 
-                />
+                    {post && post.posts && < AutoCompleteComponent
+                        data={post.posts}
+                        selectFromSearch={handleSearchInput}
+                    />}
+
+                    {updateTagPosts && updateTagPosts.length > 0 && updateTagPosts.map(post => {
+                        return (
+                            <Tag closable onClose={() => onClose(post)} key={post.id} style={{ fontWeight:700, color:"black"}}>
+                                 {post.data.title}
+                             </Tag>
+                        )
+                    })}
                     <br/>
+
                 </Card>
 
                 {mutationResult && mutationResult.updateUser && <SuccessModal data={"Successfully User Edited"}/>}

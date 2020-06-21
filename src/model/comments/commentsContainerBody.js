@@ -19,6 +19,7 @@ const COMMENTS_API = gql`
             id
             data {
                 title
+                body
             }
         }
     }
@@ -31,6 +32,7 @@ const {Sider} = Layout;
 function CommentsContainerBody(){
     const [comments, setComments] = useState([]);
     const [comment, setComment] = useState();
+    const [postOfComment, setPostOfComment]= useState([]);
     const [id,setId]=useState(null);
     const { loading,error,refetch, data } = useQuery(COMMENTS_API,{});
 
@@ -46,7 +48,16 @@ function CommentsContainerBody(){
 
     function menuClick(comment){
         setComment(comment)
+        let old=[];
+         if(comment.post !==null) {
+             old.push(comment.post);
+             setPostOfComment(old)
+         }
+         else {
+             setPostOfComment(old)
+         }
         setId(comment.id)
+
     }
 
     if (loading) return <p>Loading ...</p>;
@@ -83,6 +94,7 @@ function CommentsContainerBody(){
                     <Col xs={24} sm={0} md={0} lg={19} xl={19} style={{height: "90vh"}}>
                         {comment &&  <CommentFormLayout
                             comment={comment}
+                            post={postOfComment}
                             callbackData ={callbackMethod}
                         /> }
                         <Affix style={{ position: 'absolute', bottom: 10, left: "2%" }}>
