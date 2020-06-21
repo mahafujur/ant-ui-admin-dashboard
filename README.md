@@ -29,3 +29,12 @@ Here is the project structure:
         |   |    └──main
         │   └── styles
 
+
+        In user page, A user can be created, edited and a user can search any post
+
+        In post page, A user can create a post, edit a post and can tag any comment with a post, old comments can be remove
+
+        In Comment page, A user can tag posts with a comment and can detuch the comment also.
+
+
+        This project has used Ant-ui for UI, react apollo client for store and data management and react hooks also used in the components
